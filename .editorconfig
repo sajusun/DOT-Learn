@@ -1,0 +1,22 @@
+root = true
+
+[*]
+indent_style = space
+indent_size = 4
+end_of_line = crlf
+charset = utf-8
+trim_trailing_whitespace = true
+insert_final_newline = true
+
+[*.cs]
+# Use modern file-scoped namespaces (similar to PHP PSR-4 namespace declaration)
+csharp_style_namespace_declarations = file_scoped:warning
+
+# Code analysis preferences
+csharp_style_var_for_built_in_types = true:suggestion
+csharp_style_var_when_type_is_apparent = true:suggestion
+csharp_style_expression_bodied_methods = when_on_single_line:suggestion
+csharp_style_expression_bodied_properties = true:suggestion
+
+# Nullable Reference Types
+dotnet_diagnostic.CS8618.severity = warning

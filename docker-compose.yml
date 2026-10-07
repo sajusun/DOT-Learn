@@ -1,0 +1,57 @@
+services:
+  orderpulse-db:
+    image: postgres:16-alpine
+    container_name: orderpulse_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgrespassword
+      POSTGRES_DB: orderpulse_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d orderpulse_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  orderpulse-redis:
+    image: redis:7-alpine
+    container_name: orderpulse_redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  orderpulse-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: orderpulse_api
+    restart: unless-stopped
+    ports:
+      - "5000:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Host=orderpulse-db;Port=5432;Database=orderpulse_db;Username=postgres;Password=postgrespassword
+      - ConnectionStrings__Redis=orderpulse-redis:6379
+      - JwtSettings__Secret=OrderPulseSuperSecretKeyThatIsAtLeast32BytesLongForHmacSha256Security123456!
+      - JwtSettings__Issuer=OrderPulseApi
+      - JwtSettings__Audience=OrderPulseClient
+    depends_on:
+      orderpulse-db:
+        condition: service_healthy
+      orderpulse-redis:
+        condition: service_healthy
+
+volumes:
+  postgres_data:
+  redis_data:
