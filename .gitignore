@@ -6,7 +6,6 @@ obj/
 *.sln.docstates
 *.suo
 .vs/
-.vscode/*
 !.vscode/settings.json
 !.vscode/tasks.json
 !.vscode/launch.json
@@ -32,3 +31,5 @@ Thumbs.db
 
 # Docker
 .dockerignore
+config.bat
+node_modules
